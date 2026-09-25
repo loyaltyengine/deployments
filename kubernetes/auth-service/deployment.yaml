@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service-deployment
+  namespace: loyalty-engine
+  labels:
+    app: auth-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      containers:
+        - name: loyalty-engine-auth
+          image: elsonkhoza/loyalty-engine-auth:1.0.0
+          ports:
+            - containerPort: 3001
