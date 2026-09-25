@@ -1,6 +1,14 @@
 name: loyalty-engine
 
 services:
+  nginx:
+    build: ../nginx
+    container_name: nginx-gateway
+    ports:
+      - "80:80"
+    depends_on:
+      - auth-service
+
   # SERVICES
   auth-service:
     image: ghcr.io/loyaltyengine/loyalty-engine-auth:1.0.0
