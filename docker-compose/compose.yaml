@@ -21,6 +21,17 @@ services:
       - auth-service-db
       - redis
 
+  properties-service:
+    image: ghcr.io/loyaltyengine/loyalty-engine-properties:1.0.0
+    container_name: properties-service
+    env_file:
+      - env/.env.properties
+    ports:
+      - "3002:3002"
+    depends_on:
+      - auth-service
+      - properties-service-db
+
   redis:
     image: redis:alpine
     container_name: redis
@@ -47,10 +58,26 @@ services:
      interval: 10s
      timeout: 5s
      retries: 5
+
+  properties-service-db:
+   image: postgres:18
+   container_name: properties-service-db
+   restart: always
+   volumes:
+     - properties-service-db-data:/var/lib/postgresql/data
+   environment:
+     - POSTGRES_DB=le_properties
+     - POSTGRES_PASSWORD=password
+     - PGDATA=/var/lib/postgresql/data/pgdata
+   expose:
+     - 5432
+   healthcheck:
+     test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "le_properties" ]
+     interval: 10s
+     timeout: 5s
+     retries: 5
+
 volumes:
   auth-service-db-data:
+  properties-service-db-data:
   redis-data:
-secrets:
- db-password:
-   file: db/password.txt
-
