@@ -10,6 +10,7 @@ services:
       - auth-service
       - properties-service
       - points-service
+      - coupons-service
 
   auth-service:
     image: ghcr.io/loyaltyengine/loyalty-engine-auth:1.0.0
@@ -30,8 +31,17 @@ services:
     ports:
       - "3002:3002"
     depends_on:
-      - auth-service
       - properties-service-db
+
+  coupons-service:
+    image: ghcr.io/loyaltyengine/loyalty-engine-coupons:1.0.0
+    container_name: coupons-service
+    env_file:
+      - env/.env.coupons
+    ports:
+      - "8081:8081"
+    depends_on:
+      - coupons-service-db
 
   points-service:
     image: ghcr.io/loyaltyengine/loyalty-engine-points:1.0.0
@@ -41,7 +51,6 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - auth-service
       - points-service-db
 
   redis:
@@ -70,6 +79,20 @@ services:
      interval: 10s
      timeout: 5s
      retries: 5
+
+  coupons-service-db:
+    image: mongo:latest
+    container_name: coupons-service-db
+    hostname: coupons-service-db
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - coupons-service-db-data:/data/db
+      - coupons-service-db-configdb:/data/configdb
 
   properties-service-db:
    image: postgres:18
@@ -111,4 +134,6 @@ volumes:
   auth-service-db-data:
   properties-service-db-data:
   points-service-db-data:
+  coupons-service-db-data:
+  coupons-service-db-configdb:
   redis-data:
