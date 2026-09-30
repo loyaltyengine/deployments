@@ -6,11 +6,17 @@ services:
     container_name: nginx-gateway
     ports:
       - "80:80"
+    networks:
+      - loyalty-engine-net
     depends_on:
-      - auth-service
-      - properties-service
-      - points-service
-      - coupons-service
+      auth-service:
+        condition: service_healthy
+      properties-service:
+        condition: service_healthy
+      points-service:
+        condition: service_healthy
+      coupons-service:
+        condition: service_healthy
 
   auth-service:
     image: ghcr.io/loyaltyengine/loyalty-engine-auth:1.0.0
@@ -19,9 +25,19 @@ services:
       - env/.env.auth
     ports:
       - "3001:3001"
+    networks:
+      - loyalty-engine-net
     depends_on:
-      - auth-service-db
-      - redis
+      auth-service-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3001/auth/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 150s
 
   properties-service:
     image: ghcr.io/loyaltyengine/loyalty-engine-properties:1.0.0
@@ -30,8 +46,17 @@ services:
       - env/.env.properties
     ports:
       - "3002:3002"
+    networks:
+      - loyalty-engine-net
     depends_on:
-      - properties-service-db
+      properties-service-db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3002/properties-api/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   coupons-service:
     image: ghcr.io/loyaltyengine/loyalty-engine-coupons:1.0.0
@@ -40,32 +65,59 @@ services:
       - env/.env.coupons
     ports:
       - "8081:8081"
+    networks:
+      - loyalty-engine-net
     depends_on:
-      - coupons-service-db
+      coupons-service-db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   points-service:
     image: ghcr.io/loyaltyengine/loyalty-engine-points:1.0.0
     container_name: points-service
     env_file:
       - env/.env.points
+    networks:
+      - loyalty-engine-net
     ports:
       - "8080:8080"
     depends_on:
-      - points-service-db
+      points-service-db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   redis:
     image: redis:alpine
     container_name: redis
+    networks:
+      - loyalty-engine-net
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # DATABASES
   auth-service-db:
    image: postgres:18
    container_name: auth-service-db
    restart: always
+   networks:
+     - loyalty-engine-net
    volumes:
      - auth-service-db-data:/var/lib/postgresql/data
    environment:
@@ -87,17 +139,26 @@ services:
     restart: always
     ports:
       - "27017:27017"
+    networks:
+      - loyalty-engine-net
     environment:
       - MONGO_INITDB_ROOT_USERNAME=user
       - MONGO_INITDB_ROOT_PASSWORD=password
     volumes:
       - coupons-service-db-data:/data/db
       - coupons-service-db-configdb:/data/configdb
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   properties-service-db:
    image: postgres:18
    container_name: properties-service-db
    restart: always
+   networks:
+     - loyalty-engine-net
    volumes:
      - properties-service-db-data:/var/lib/postgresql/data
    environment:
@@ -116,6 +177,8 @@ services:
    image: postgres:18
    container_name: points-service-db
    restart: always
+   networks:
+     - loyalty-engine-net
    volumes:
      - points-service-db-data:/var/lib/postgresql/data
    environment:
@@ -129,6 +192,10 @@ services:
      interval: 10s
      timeout: 5s
      retries: 5
+
+networks:
+  loyalty-engine-net:
+    driver: bridge
 
 volumes:
   auth-service-db-data:
