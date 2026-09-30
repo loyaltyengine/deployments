@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: auth-service-db
+  namespace: loyalty-engine
+  labels:
+    app: auth-service-db
+spec:
+  serviceName: auth-service-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service-db
+  template:
+    metadata:
+      labels:
+        app: auth-service-db
+    spec:
+      containers:
+        - name: auth-service-db
+          image: postgres:18
+          ports:
+            - containerPort: 5432
+              name: postgres
+          envFrom:
+            - secretRef:
+                name: auth-service-db-secret
+          volumeMounts:
+            - name: auth-service-db-data
+              mountPath: /var/lib/postgresql
+          readinessProbe:
+            exec:
+              command: [ "pg_isready", "-U", "postgres", "-d", "le_auth" ]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: auth-service-db-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi

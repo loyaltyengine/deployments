@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: loyalty-engine
+spec:
+  clusterIP: None # Headless service
+  selector:
+    app: redis # redis statefulset label
+  ports:
+    - port: 6379
+      targetPort: 6379
+      name: redis # Service port name
