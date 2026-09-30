@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: loyalty-engine
+spec:
+  type: ClusterIP
+  selector:
+    app: auth-service # auth service deployment label
+  ports:
+    - port: 3001
+      targetPort: http # auth service container port 3001 or use container port name http
+      name: http # Service port name

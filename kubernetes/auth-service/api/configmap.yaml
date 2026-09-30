@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-config
+  namespace: loyalty-engine
+data:
+  NODE_ENV: "production"
+  PORT: "3001"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  GOOGLE_REDIRECT_URI: "http://localhost:3000/auth/v1/oauth/google/callback"
+  PROPERTIES_SERVICE_URL: "http://properties-service:3002"
+  NODE_OPTIONS: "--max-old-space-size=1536"

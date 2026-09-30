@@ -2,7 +2,7 @@ name: loyalty-engine
 
 services:
   nginx:
-    build: ../nginx
+    build: ./nginx
     container_name: nginx-gateway
     ports:
       - "80:80"
