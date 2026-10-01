@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: loyalty-engine-ingress
+  namespace: loyalty-engine
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false" # Disable SSL redirect, review later for HTTPS
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: loyalty-engine.local
+      http:
+        paths:
+          # Auth Service
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 3001
