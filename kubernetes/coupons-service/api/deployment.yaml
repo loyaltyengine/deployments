@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coupons-service
+  namespace: loyalty-engine
+  labels:
+    app: coupons-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coupons-service
+  template:
+    metadata:
+      labels:
+        app: coupons-service
+    spec:
+      containers:
+        - name: coupons-service
+          image: ghcr.io/loyaltyengine/loyalty-engine-coupons:1.0.0
+          envFrom:
+            - configMapRef:
+                name: coupons-service-config
+            - secretRef:
+                name: coupons-service-secret
+          ports:
+            - containerPort: 8081
+              name: http # Can be used instead of port number
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "768Mi"
+            requests:
+              cpu: "250m"
+              memory: "384Mi"

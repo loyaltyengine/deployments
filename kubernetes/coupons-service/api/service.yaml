@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: coupons-service
+  namespace: loyalty-engine
+spec:
+  type: ClusterIP
+  selector:
+    app: coupons-service # coupons service deployment label
+  ports:
+    - port: 8081
+      targetPort: http # coupons service container port 8081 or use container port name http
+      name: http # Service port name
