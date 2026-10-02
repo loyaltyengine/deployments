@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: coupons-service-db
+  namespace: loyalty-engine
+  labels:
+    app: coupons-service-db
+spec:
+  serviceName: coupons-service-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coupons-service-db
+  template:
+    metadata:
+      labels:
+        app: coupons-service-db
+    spec:
+      containers:
+        - name: coupons-service-db
+          image: mongo:8.3.11
+          ports:
+            - containerPort: 27017
+              name: mongo
+          envFrom:
+            - secretRef:
+                name: coupons-service-db-secret
+          volumeMounts:
+            - name: coupons-service-db-data
+              mountPath: /data/db
+            - name: coupons-service-db-configdb
+              mountPath: /data/configdb
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 5
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: coupons-service-db-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 2Gi
+    - metadata:
+        name: coupons-service-db-configdb
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi

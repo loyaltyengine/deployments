@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: loyalty-engine-protected-ingress
+  namespace: loyalty-engine
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: "http://auth-service.loyalty-engine.svc.cluster.local:3001/auth/v1/verify-token"
+    nginx.ingress.kubernetes.io/auth-pass-request-headers: "Authorization"
+    nginx.ingress.kubernetes.io/auth-response-headers: "X-User-Id" # Pass user id
+    nginx.ingress.kubernetes.io/ssl-redirect: "false" # Disable SSL redirect, review later for HTTPS
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: loyalty-engine.local
+      http:
+        paths:
+          # Coupons Service
+          - path: /coupons-api
+            pathType: Prefix
+            backend:
+              service:
+                name: coupons-service
+                port:
+                  number: 8081
