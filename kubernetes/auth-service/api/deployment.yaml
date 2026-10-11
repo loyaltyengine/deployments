@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: ghcr.io/loyaltyengine/loyalty-engine-auth:1.0.0
+          image: ghcr.io/loyaltyengine/auth-service:v1.0.0-alpha.1
           envFrom:
             - configMapRef:
                 name: auth-service-config
