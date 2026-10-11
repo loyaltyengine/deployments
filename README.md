@@ -135,15 +135,6 @@ View logs for a specific pod:
 kubectl logs <pod-name> -n loyalty-engine
 ```
 
-## Container Images
-
-The following container images are used in this deployment:
-
-- **Auth Service**: `ghcr.io/loyaltyengine/loyalty-engine-auth:1.0.0`
-- **Properties Service**: `ghcr.io/loyaltyengine/loyalty-engine-properties:1.0.0`
-- **Points Service**: `ghcr.io/loyaltyengine/loyalty-engine-points:1.0.0`
-- **Coupons Service**: `ghcr.io/loyaltyengine/loyalty-engine-coupons:1.0.0`
-
 ## Default Database Credentials
 
 **PostgreSQL:**

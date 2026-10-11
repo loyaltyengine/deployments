@@ -19,7 +19,7 @@ services:
         condition: service_healthy
 
   auth-service:
-    image: ghcr.io/loyaltyengine/loyalty-engine-auth:1.0.0
+    image: ghcr.io/loyaltyengine/auth-service:v1.0.0-alpha.1
     container_name: auth-service
     env_file:
       - env/.env.auth
@@ -40,7 +40,7 @@ services:
       start_period: 150s
 
   properties-service:
-    image: ghcr.io/loyaltyengine/loyalty-engine-properties:1.0.0
+    image: ghcr.io/loyaltyengine/properties-service:v1.0.0-alpha.1
     container_name: properties-service
     env_file:
       - env/.env.properties
@@ -59,7 +59,7 @@ services:
       start_period: 40s
 
   coupons-service:
-    image: ghcr.io/loyaltyengine/loyalty-engine-coupons:1.0.0
+    image: ghcr.io/loyaltyengine/coupons-service:v1.0.0-alpha.1
     container_name: coupons-service
     env_file:
       - env/.env.coupons
@@ -78,7 +78,7 @@ services:
       start_period: 40s
 
   points-service:
-    image: ghcr.io/loyaltyengine/loyalty-engine-points:1.0.0
+    image: ghcr.io/loyaltyengine/points-service:v1.0.0-alpha.1
     container_name: points-service
     env_file:
       - env/.env.points
